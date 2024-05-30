@@ -2,9 +2,45 @@
 
 if (!is_singular('projektitiedot')) {return;}
 
+// global $globalSFormData;
 $project_id = get_the_ID();
 $data = the_form_stored_data();
+$user = wp_get_current_user();
+
+
+$project_intdata = !empty(get_post_meta( $project_id, sprintf('%s_status', $_GET['tm']), true )) ? json_decode( get_post_meta( $project_id, sprintf('%s_status', $_GET['tm']), true ), true ) : [];
+if ( isset($project_intdata[$_GET['tmin']]['status']) && !empty($project_intdata[$_GET['tmin']]['status']) && $project_intdata[$_GET['tmin']]['status'] >= 2 && isset($user->roles) && !empty($user->roles) && !array_intersect( [ 'administrator' ], $user->roles ) ) {
+
+    ?>
+<!-- Main Content -->
+<section class="py-10">
+    <div class="container px-4">
+        <!-- grid View Item -->
+        <div class="grid grid-cols-1 gap-4">
+            <!-- card_item -->
+            <div class="card_item relative h-fit">
+                <!-- Card Header --><?php echo wp_kses_post(noste_form_header('form')); ?><!-- Card Header -->
+                <form action="<?php echo esc_url(get_permalink(get_the_ID())); ?>" method="post" enctype="multipart/form-data" class="ajax-submit">
+
+                    <button id="preview_btn_draft" data-tm="<?php echo esc_attr($_GET['tm'] ?? ''); ?>" data-tmin="<?php echo esc_attr($_GET['tmin'] ?? ''); ?>" data-project_id="<?php echo esc_attr($project_id); ?>">
+                        preview
+                    </button>
+
+                <!-- Card footer -->
+                <?php echo wp_kses_post(noste_form_footer('form')); ?>
+                <!-- Card footer -->
+				</form>
+            </div>
+        </div>
+    </div>
+</section>
+        <?php 
+    return;
+}
+
 ?>
+
+
 
 
 <!-- Main Content -->
